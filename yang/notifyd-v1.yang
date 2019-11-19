@@ -1,0 +1,163 @@
+module notifyd-v1 {
+	namespace "urn:vyatta.com:mgmt:notifyd:1";
+	prefix notifyd-v1;
+
+	import configd-v1 {
+		prefix configd;
+	}
+
+	organization "AT&T Inc.";
+	contact
+		"AT&T
+		 Postal: 208 S. Akard Street
+		 Dallas, TX 75202
+		 Web: www.att.com";
+
+	description
+		"Copyright (c) 2019, AT&T Intellectual Property.
+		 All rights reserved.
+
+		 Redistribution and use in source and binary forms, with or without
+		 modification, are permitted provided that the following conditions
+		 are met:
+
+		 1. Redistributions of source code must retain the above copyright
+		    notice, this list of conditions and the following disclaimer.
+		 2. Redistributions in binary form must reproduce the above
+		    copyright notice, this list of conditions and the following
+		    disclaimer in the documentation and/or other materials provided
+		    with the distribution.
+		 3. Neither the name of the copyright holder nor the names of its
+		    contributors may be used to endorse or promote products derived
+		    from this software without specific prior written permission.
+
+		 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+		 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+		 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+		 FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+		 COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+		 INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+		 BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+		 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+		 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+		 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+		 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+		 POSSIBILITY OF SUCH DAMAGE.
+
+		 SPDX-License-Identifier: BSD-3-Clause
+
+		 The YANG module for notifyd-v1.
+		 Notifyd is a component that allows scripts to be executed when a notification
+		 is emitted on the message bus. This allows for arbitrary script execution when
+		 events happen.
+		";
+
+	revision 2019-04-19 {
+		description "Initial release";
+	}
+
+	container notifyd {
+		description "Notifyd allows for scripts to be executed when events happen";
+		configd:help "Notifier service";
+		container state {
+			description "Contains operational information about notifyd";
+			config false;
+			leaf registered-handlers {
+				description "The collapsed number of registered handlers";
+				type uint64;
+			}
+			leaf scripts-executed {
+				description "The number of scripts executed since the last start";
+				type uint64;
+			}
+			leaf concurrency-limit {
+				description "The limit on the number of scripts run in parallel";
+				type uint32;
+			}
+		}
+	}
+
+	rpc when {
+		description "Registers a new transient handler to be called when the " +
+               "module:notification event is emitted";
+		input {
+			leaf module {
+				description "The YANG module";
+				type string;
+				mandatory true;
+			}
+			leaf notification {
+				description "The YANG notification name";
+				type string;
+				mandatory true;
+			}
+			leaf script {
+				description "The script to call and any arguments";
+				type string;
+				mandatory true;
+			}
+		}
+	}
+
+	rpc done {
+		description "Removes a transient handler that would be called when the " +
+               "module:notification event is emitted";
+		input {
+			leaf module {
+				description "The YANG module";
+				type string;
+				mandatory true;
+			}
+			leaf notification {
+				description "The YANG notification name";
+				type string;
+				mandatory true;
+			}
+			leaf script {
+				description "The script to call and any arguments";
+				type string;
+				mandatory true;
+			}
+		}
+	}
+
+	grouping handlers {
+		list handlers {
+			key id;
+			leaf id {
+				description "Arbitray identifier for required list key";
+				type uint64;
+			}
+			leaf module {
+				description "YANG module name";
+				type string;
+			}
+			leaf notification {
+				description "YANG notification name";
+				type string;
+			}
+			leaf script {
+				description "Script to be called";
+				type string;
+			}
+		}
+	}
+
+	rpc list-handlers {
+		description "Lists all the registered handlers";
+		output {
+			container static {
+				description "All handlers that are configured statically to be called";
+				uses handlers;
+			}
+			container transient {
+				description "All handlers that are added at runtime";
+				uses handlers;
+			}
+			container collapsed {
+				description "Deduplicated list of handlers";
+				uses handlers;
+			}
+		}
+	}
+}

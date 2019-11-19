@@ -1,0 +1,10 @@
+[Vyatta Component]
+Name=net.vyatta.vci.notifyd
+Description=Script notifier
+ExecName=/lib/vci/notify/bin/notifyd
+ConfigFile=/dev/null
+StartOnBoot=true
+
+[Model net.vyatta.vci.notifyd.v1]
+Modules=notifyd-v1
+ModelSets=vyatta-v1

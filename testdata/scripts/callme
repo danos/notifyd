@@ -1,0 +1,4 @@
+#!/bin/sh
+input=$(cat)
+echo $0 $@ $(env) > $input
+echo $0 $@ $input > $input

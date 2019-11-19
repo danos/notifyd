@@ -1,0 +1,31 @@
+Source: notifyd
+Section: contrib/net
+Priority: extra
+Maintainer: Vyatta Package Maintainers <DL-vyatta-help@att.com>
+Build-Depends:
+ debhelper (>= 9),
+ dh-golang,
+ dh-vci,
+ dh-yang,
+ golang-any,
+ golang-github-danos-encoding-rfc7951-dev,
+ golang-github-danos-utils-args-dev,
+ golang-github-danos-vci-dev,
+ golang-github-fsnotify-fsnotify-dev,
+ golang-github-go-ini-ini-dev,
+ golang-jsouthworth-etm-dev,
+ golang-jsouthworth-immutable-dev
+Standards-Version: 3.9.8
+
+Package: notifyd
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: VCI component to call scripts when events happen
+ A VCI component that calls scripts when notifications occur
+
+Package: notifyd-v1-yang
+Architecture: all
+Section: admin
+Priority: optional
+Description: notifyd-v1 module
+ The YANG module for notifyd-v1

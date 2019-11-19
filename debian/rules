@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+export DH_GOPKG := github.com/danos/notifyd
+GOBUILDDIR := _build
+
+%:
+	dh $@ --buildsystem=golang --with=golang,vci,yang --builddirectory=$(GOBUILDDIR)
+
+override_dh_auto_build: vet
+	dh_auto_build
+
+override_dh_auto_install:
+	dh_auto_install --destdir=debian/tmp
+
+override_dh_auto_test:
+	dh_auto_test -- -cover
+# We do not vet vendor code
+vet:
+	if go doc cmd/vet >/dev/null 2>&1; then \
+		go tool vet $$(find . -type f -name \*.go | xargs dirname | \
+			sort -u | grep -v "/vendor/"); \
+	fi
